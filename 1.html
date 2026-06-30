@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 1 - Asteria FTC Academy</title>
+
+  <link rel="icon" href="images/blank_logo.png" >
+  <link rel="apple-touch-icon" href="images/logo.png">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@supabase/supabase-js@2.43.4/dist/umd/supabase.js"></script>
+</head>
+<body class="bg-zinc-950 text-white p-6">
+
+  <a href="index.html" class="text-blue-400 mb-6 inline-block">← Back to Modules</a>
+
+  <h1 class="text-4xl font-bold mb-2">Introduction to FTC</h1>
+  <p class="text-zinc-400 mb-8">FIRST philosophy and basic concepts</p>
+
+  <iframe width="420" height="315"
+src="https://www.youtube.com/embed/tgbNymZ7vqY">
+</iframe>
+
+  <div class="bg-zinc-900 rounded-3xl p-8">
+    <h3 class="text-2xl font-semibold mb-6">Do you have any questions about this module?</h3>
+    
+    <input type="text" id="user-name" placeholder="Your Full Name" class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl p-5 mb-4 text-white">
+    <input type="email" id="user-mail" placeholder="Your Email Address" class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl p-5 mb-4 text-white">
+    
+    <textarea id="question-input" rows="5" class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl p-5 text-white" placeholder="Write your question here..."></textarea>
+    
+    <button id="submit-btn" class="mt-6 w-full bg-blue-600 hover:bg-blue-700 py-4 rounded-2xl font-semibold transition-colors">
+      Send Question
+    </button>
+  </div>
+
+<script>
+    window.supabaseClient = null;
+
+    window.onload = function() {
+      try {
+        const supabaseLib = (typeof Supabase !== 'undefined') ? Supabase : (typeof supabase !== 'undefined' ? supabase : null);
+        
+        if (supabaseLib) {
+          // Güncel proje bilgilerinle istemciyi başlattık
+          window.supabaseClient = supabaseLib.createClient(
+            'https://plsfmbknqsjgvpjoubht.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsc2ZtYmtucXNqZ3Zwam91Ymh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1ODc3NzcsImV4cCI6MjA5NjE2Mzc3N30.TLee9QqcSjvT00ouwF53ntu-K7kcY9R_BDK9Tv82aF4'
+          );
+          console.log("Supabase successfully initialized.");
+        } else {
+          console.error("Supabase CDN blocked!");
+          alert("Connection error: Please disable your AdBlocker and refresh.");
+        }
+      } catch (e) {
+        console.error("Initialization error:", e);
+      }
+    };
+
+    document.getElementById('submit-btn').addEventListener('click', async function() {
+      if (!window.supabaseClient) {
+        alert("Database connection is not ready.");
+        return;
+      }
+
+      const name = document.getElementById('user-name').value.trim();
+      const mail = document.getElementById('user-mail').value.trim();
+      const question = document.getElementById('question-input').value.trim();
+
+      if (!name || !mail || !question) {
+        alert("Please fill all fields");
+        return;
+      }
+
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.innerText = "Sending...";
+
+      try {
+        const { error } = await window.supabaseClient.from('workshop_questions').insert({
+          module_id: 1,
+          user_name: name,
+          user_mail: mail,
+          question: question
+        });
+
+        if (error) {
+          // Eğer yine "Invalid API key" dönerse, Supabase panelinden yeni key kopyalanmalıdır
+          alert("Database Error: " + error.message);
+        } else {
+          alert("Question sent! Thank you.");
+          document.getElementById('question-input').value = '';
+        }
+      } catch (err) {
+        alert("An unexpected error occurred: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Send Question";
+      }
+    });
+  </script>
+</body>
+</html>
