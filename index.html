@@ -21,26 +21,50 @@
 
 <body class="bg-zinc-950 text-white">
 <!-- iOS ve Genel Ana Ekrana Ekle Butonu -->
-<button onclick="showInstallInstruction()" 
-        class="fixed bottom-6 right-6 bg-black hover:bg-gray-800 text-white px-6 py-3 rounded-2xl shadow-xl flex items-center gap-2 z-50 transition-all">
+<!-- Ana Ekrana Ekle Butonu -->
+<button id="installBtn" 
+        onclick="handleInstallClick()"
+        class="fixed bottom-6 right-6 bg-black hover:bg-gray-800 text-white px-6 py-3 rounded-2xl shadow-xl flex items-center gap-2 z-50 hidden transition-all">
   <i class="fas fa-download"></i>
   <span>Ana Ekrana Ekle</span>
 </button>
 
 <script>
-  function showInstallInstruction() {
-    if (navigator.standalone) {
-      alert("Zaten ana ekranda yüklü!");
+  let deferredPrompt;
+
+  // Android + Chrome için otomatik algılama
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById('installBtn').classList.remove('hidden');
+  });
+
+  function handleInstallClick() {
+    if (deferredPrompt) {
+      // Android / Chrome
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(() => {
+        deferredPrompt = null;
+      });
     } else {
+      // iPhone Safari
       alert("Ana Ekrana Eklemek İçin:\n\n" +
-            "1. Aşağıdaki Paylaş butonuna dokunun (📤)\n" +
+            "1. Sağ üstteki Paylaş butonuna (📤) dokunun\n" +
             "2. Aşağı kaydırın\n" +
-            "3. 'Ana Ekrana Ekle' seçeneğine dokunun\n\n" +
-            "Sonra uygulamayı tam ekran açabilirsiniz.");
+            "3. 'Ana Ekrana Ekle' seçeneğine dokunun");
     }
   }
-</script>
 
+  // Sayfa yüklendiğinde butonu göster (iOS için yedek)
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      if (!document.getElementById('installBtn').classList.contains('hidden') === false) {
+        document.getElementById('installBtn').classList.remove('hidden');
+      }
+    }, 800);
+  });
+</script>
+  
   <header class="bg-zinc-900 border-b border-zinc-700">
     <div class="max-w-6xl mx-auto px-6 py-5 flex justify-between items-center">
       <h1 class="text-3xl font-bold">Asteria FTC Academy</h1>
