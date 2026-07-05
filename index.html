@@ -20,31 +20,25 @@
 </head>
 
 <body class="bg-zinc-950 text-white">
-<!-- Ana Ekrana Ekle Butonu -->
-<button id="installBtn" 
-        class="fixed bottom-6 right-6 bg-black hover:bg-gray-800 text-white px-6 py-3 rounded-2xl shadow-xl flex items-center gap-2 z-50 hidden transition-all">
+<!-- iOS ve Genel Ana Ekrana Ekle Butonu -->
+<button onclick="showInstallInstruction()" 
+        class="fixed bottom-6 right-6 bg-black hover:bg-gray-800 text-white px-6 py-3 rounded-2xl shadow-xl flex items-center gap-2 z-50 transition-all">
   <i class="fas fa-download"></i>
   <span>Ana Ekrana Ekle</span>
 </button>
 
 <script>
-  let deferredPrompt;
-
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    document.getElementById('installBtn').classList.remove('hidden');
-  });
-
-  document.getElementById('installBtn').addEventListener('click', () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then((choice) => {
-        console.log('Kullanıcı tercihi:', choice.outcome);
-        deferredPrompt = null;
-      });
+  function showInstallInstruction() {
+    if (navigator.standalone) {
+      alert("Zaten ana ekranda yüklü!");
+    } else {
+      alert("Ana Ekrana Eklemek İçin:\n\n" +
+            "1. Aşağıdaki Paylaş butonuna dokunun (📤)\n" +
+            "2. Aşağı kaydırın\n" +
+            "3. 'Ana Ekrana Ekle' seçeneğine dokunun\n\n" +
+            "Sonra uygulamayı tam ekran açabilirsiniz.");
     }
-  });
+  }
 </script>
 
   <header class="bg-zinc-900 border-b border-zinc-700">
